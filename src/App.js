@@ -1,25 +1,40 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App () {
+    const [filter, setFilter] = useState('')
+    const [categories, setCategories] = useState([])
+    const [result, setResult] = useState([])
+
+    const onFilterChange = (e) => {
+        setFilter(e.target.value)
+    }
+
+    useEffect(() => {
+        fetch('https://api.publicapis.org/categories')
+            .then(response => response.json())
+            .then(data => setCategories(data.categories));
+    }, [])
+
+    useEffect(() => {
+        if (filter.length > 0) {
+            setResult(categories.filter(cate => cate.toLowerCase().includes(filter.toLowerCase())))
+        } else {
+            setResult(categories)
+        }
+    }, [filter])
+
+    return (
+        <div className="container">
+            <div className='content'>
+                <div className='input'>Filter: <input defaultValue={filter} value={filter} onChange={onFilterChange} /></div>
+                <table>
+                    <th>Categories</th>
+                    {result.map((v) => <tr>{v}</tr>)}
+                </table>
+            </div>
+        </div>
+    );
 }
 
 export default App;
